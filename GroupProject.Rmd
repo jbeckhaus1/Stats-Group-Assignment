@@ -51,8 +51,19 @@ Describe the problem in part one.
 
 Solve the problem using R.
 ```{r}
-mydata = read.csv("FlyingFoxMonitoring.csv", header = TRUE)
-attach(mydata)
+##read data from the csv file
+csvData = read.csv("FlyingFoxMonitoring.csv", header = TRUE)
+
+##remove all rows of data with NA
+mydata = na.omit(csvData)
+
+##the true sum of  flying foxes
+truesum = mydata$BlackFlyingFox.Count+mydata$GreyHeadedFlyingFox.Count+mydata$LittleRedFlyingFox.Count
+
+##compare true sums to the sum in the csv and remove
+#if values are not equal
+mydata=mydata[(mydata$TotalSpecies.Count==truesum),]
+
 ```
 
 Interpret the solution of the problem.
