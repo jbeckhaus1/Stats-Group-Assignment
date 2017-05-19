@@ -44,15 +44,19 @@ Group Project
 Explain the assignment.
 
 
-
 This project uses Git for versioning
+https://github.com/jbeckhaus1/Stats-Group-Assignment
 
 
-Part One
+Part One - Load and clean up data
 --------------------------------------------------------
 
 Load and clean the data is the csv file
 
+Some of the records (rows) in the data set are inconsistent, in that either the total species count does not equal
+the sum of the counts for the three species, or the variable FlyingFoxesAbsent does not match the total count being
+zero or not.
+Remove inconsistent records from the data set.
 
 ```{r}
 #load the data from csv
@@ -64,16 +68,29 @@ redFox<- suppressWarnings(c(as.numeric(as.character(foxData$LittleRedFlyingFox.C
 greyFox<- suppressWarnings(c(as.numeric(as.character(foxData$GreyHeadedFlyingFox.Count))))
 totalFox <- suppressWarnings(c(as.numeric(as.character(foxData$TotalSpecies.Count))))
 
+
+#remove rows where variable FlyingFoxesAbsent does not match the total count being zero or not.
+
+idHasFox=which(foxData$FlyingFoxesAbsent!=TRUE)
+idHasNoFox=which(suppressWarnings(c(as.numeric(as.character(foxData$TotalSpecies.Count))))!=0)
+illogicalFox=setdiff(idHasFox,idHasNoFox)
+
+blkFox=blkFox[-illogicalFox]
+redFox=redFox[-illogicalFox]
+greyFox=greyFox[-illogicalFox]
+totalFox=totalFox[-illogicalFox]
 ##removing data with NA
 
 #make a vector of the rows which have missing data
 idNA=c(which(is.na(blkFox)),which(is.na(redFox)),which(is.na(greyFox)),which(is.na(totalFox)))
 paste(length(idNA),"cases have NAs")
+
 #remove those rows
 blkFox=blkFox[-idNA]
 redFox=redFox[-idNA]
 greyFox=greyFox[-idNA]
 totalFox=totalFox[-idNA]
+
 
 #calculate totals based on each species
 myTotal = blkFox+redFox+greyFox
@@ -85,40 +102,73 @@ paste(sum(is.na(idBadMath)),"rows have totals that dont match the sum of each sp
 #making a vecor of the NAs (which are actually the rows with bad maths)
 idBadMath=which(is.na(idBadMath))
 
+
+
 #removing the rows that have bad maths
 blkFox=blkFox[-idBadMath]
 redFox=redFox[-idBadMath]
 greyFox=greyFox[-idBadMath]
 totalFox=totalFox[-idBadMath]
-    
+
+
+
+
 ```
 
 Interpret the solution of the problem.
 
-Part Two
+Part Two - Camp size
 --------------------------------------------------------
-
+(a) [2 marks] Analyse the distribution of the total camp size (TotalSpecies.Count) and the distribution of the
+natural logarithm2 of the total camp size for non-empty camps.
+Explain why the logarithm of the camp size is the more meaningful variable to consider.
 ```{r}
 ##natural logarithm of the total species count per camp
-idHasFox=which(foxData$FlyingFoxesAbsent==FALSE)
-
-logCampSize = log(totalFox)
+log.CampSize=log(totalFox)
+#paste(totalFox,logCampSize)
 #logCampSize
-##histogram of camp size logarithm
-hist(logCampSize)
-mean(logCampSize)
-##boot strap of mean camp size logarithm
+totalFox.length=length(totalFox)
 
-b = 500 #number of bootstrap statistics
+##histogram of camp size logarithm
+hist(log.CampSize)
+```
+
+
+(b) [2 marks] Use bootstrapping to compute a 95% confidence interval for the mean logarithm of the total camp size for
+non-empty camps.
+Interpret your result.
+```{r}
+
+##boot strap of mean camp size logarithm
+##Generating a Bootstrap Distribution
+b = 10000
 boot.dist = rep(NA, b)
 for (i in 1:b) {
-  boot.sample = sample(logCampSize, replace=TRUE)
-  boot.dist[i] = mean(logCampSize)
+boot.sample = sample(b, replace=TRUE)
+boot.dist=log(boot.sample)
+
 }
-
-hist(boot.dist)
-quantile(boot.dist, c(0.025, 0.975))
-sd(boot.dist)
-
+mean(boot.dist >= log.CampSize)
 
 ```
+
+Part Three - Species Proportions
+--------------------------------------------------------
+
+(a) [2 marks] Compute the proportions of each species at each camp site and visualise them. Then compute the overall
+proportions of each species.
+Discuss your results.
+
+```{r}
+
+```
+
+(b) [2 marks] Analyse whether the total camp size and the proportion of Little Red Flying Foxes are associated by
+testing at a signifcance level of 1% whether whether there is evidence that the correlation between the total size of
+a camp and the proportion of Little Red Flying Foxes in that camp is non-zero.
+Interpret your results.
+
+```{r}
+
+```
+
