@@ -45,7 +45,9 @@ Explain the assignment.
 
 
 This project uses Git for versioning
+
 https://github.com/jbeckhaus1/Stats-Group-Assignment
+
 https://github.com/rachelsoma/Stats-Group-Assignment
 
 
@@ -68,7 +70,7 @@ blkFox <- suppressWarnings(c(as.numeric(as.character(foxData$BlackFlyingFox.Coun
 redFox<- suppressWarnings(c(as.numeric(as.character(foxData$LittleRedFlyingFox.Count))))
 greyFox<- suppressWarnings(c(as.numeric(as.character(foxData$GreyHeadedFlyingFox.Count))))
 totalFox <- suppressWarnings(c(as.numeric(as.character(foxData$TotalSpecies.Count))))
-
+camp <- (as.character(foxData$Camp))
 
 #remove rows where variable FlyingFoxesAbsent does not match the total count being zero or not.
 
@@ -80,10 +82,11 @@ blkFox=blkFox[-illogicalFox]
 redFox=redFox[-illogicalFox]
 greyFox=greyFox[-illogicalFox]
 totalFox=totalFox[-illogicalFox]
+camp=camp[-illogicalFox]
 ##removing data with NA
 
 #make a vector of the rows which have missing data
-idNA=c(which(is.na(blkFox)),which(is.na(redFox)),which(is.na(greyFox)),which(is.na(totalFox)))
+idNA=c(which(is.na(blkFox)),which(is.na(redFox)),which(is.na(greyFox)),which(is.na(totalFox)),which(is.na(camp)))
 paste(length(idNA),"cases have NAs")
 
 #remove those rows
@@ -91,6 +94,7 @@ blkFox=blkFox[-idNA]
 redFox=redFox[-idNA]
 greyFox=greyFox[-idNA]
 totalFox=totalFox[-idNA]
+camp=camp[-idNA]
 
 
 #calculate totals based on each species
@@ -110,6 +114,7 @@ blkFox=blkFox[-idBadMath]
 redFox=redFox[-idBadMath]
 greyFox=greyFox[-idBadMath]
 totalFox=totalFox[-idBadMath]
+camp=camp[-idBadMath]
 
 
 
@@ -125,10 +130,12 @@ natural logarithm2 of the total camp size for non-empty camps.
 Explain why the logarithm of the camp size is the more meaningful variable to consider.
 ```{r}
 ##natural logarithm of the total species count per camp
-log.CampSize=log(totalFox)
+foxyCamps=which(foxData$FlyingFoxesAbsent!=TRUE)
+foxyCamps=totalFox[foxyCamps]
+log.CampSize=log(foxyCamps)
 #paste(totalFox,logCampSize)
 #logCampSize
-totalFox.length=length(totalFox)
+foxyCamps.length=length(foxyCamps)
 
 ##histogram of camp size logarithm
 hist(log.CampSize)
@@ -147,9 +154,10 @@ boot.dist = rep(NA, b)
 for (i in 1:b) {
 boot.sample = sample(b, replace=TRUE)
 boot.dist=log(boot.sample)
-
+boot.dist[i]=mean(boot.dist)
+sd(boot.dist)
 }
-mean(boot.dist >= log.CampSize)
+hist(boot.dist)
 
 ```
 
@@ -161,6 +169,15 @@ proportions of each species.
 Discuss your results.
 
 ```{r}
+
+
+#proportion for whole species
+blk=sum(blkFox)
+red=sum(redFox)
+grey=sum(greyFox)
+foxProp=c(blk,red,grey)/sum(totalFox)*100
+
+pie(table(foxProp))
 
 ```
 
