@@ -46,6 +46,7 @@ Explain the assignment.
 
 This project uses Git for versioning
 https://github.com/jbeckhaus1/Stats-Group-Assignment
+https://github.com/rachelsoma/Stats-Group-Assignment
 
 
 Part One - Load and clean up data
