@@ -152,7 +152,7 @@ Interpret your result.
 b = 10000
 boot.dist = rep(NA, b)
 for (i in 1:b) {
-boot.sample = sample(b, replace=TRUE)
+boot.sample = sample(foxyCamps, replace=TRUE)
 boot.dist=log(boot.sample)
 boot.dist[i]=mean(boot.dist)
 sd(boot.dist)
