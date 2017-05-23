@@ -231,5 +231,7 @@ indo.lm=lm(indoFox ~ as.numeric(indoDates))
 summary(indo.lm)
 
 plot(indoFox~indoDates, col=redblue(5),xlab="Dates", ylab = "Num. FLying Foxes")
+abline(indo.lm)
+
 ```
 
