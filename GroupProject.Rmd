@@ -154,7 +154,6 @@ sd(boot.dist)
 }
 hist(boot.dist)
 
-
 ```
 
 Part Three - Species Proportions
@@ -165,6 +164,7 @@ proportions of each species.
 Discuss your results.
 
 ```{r}
+#still need to do proportions for each campsite.
 
 
 #proportion for whole species
@@ -173,7 +173,7 @@ red=sum(redFox)
 grey=sum(greyFox)
 foxProp=c(blk,red,grey)/sum(totalFox)*100
 
-pie(table(foxProp))
+barplot(matrix(foxProp),beside=TRUE, col=grey.colors(3), ylim=c(0,100))
 
 ```
 
@@ -202,7 +202,7 @@ use the function as.numeric to convert the resulting date objects to a numeric v
 ehpCamp=foxData$EHP.CampId
 ehpCamp=ehpCamp[-dirty]
 #Use the function as.Date to convert the date strings in the variable SurveyDate into dates. 
-date <- suppressWarnings(c(as.numeric(as.Date(foxData$SurveyDate,"%d/%m/%y"))))
+date <- suppressWarnings(c(as.Date(foxData$SurveyDate,"%d/%m/%y")))
 date=date[-dirty]
 
 #vector of id for Indooroopilly Island Camp
@@ -213,7 +213,10 @@ indoDates=date[idIndoIsland]
 indoFox=totalFox[idIndoIsland]
 
 # This is probably wrong
-indo.lm=lm(indoFox ~indoDates)
+indo.lm=lm(indoFox ~ as.numeric(indoDates))
+
 summary(indo.lm)
+
+plot(indoFox~indoDates, col="red",xlab="Dates", ylab = "Num. FLying Foxes")
 ```
 
