@@ -31,7 +31,7 @@ below, declare that:
 Name               | Student Number | Contribution (%)
 -------------------|----------------|-----------------
 Rachel Hardie      |  18820821      |
-Hayden Smith       |                |
+Simon              |                |
 Jack Beckhaus      |                |
                    |                |
 
@@ -71,6 +71,8 @@ redFox<- suppressWarnings(c(as.numeric(as.character(foxData$LittleRedFlyingFox.C
 greyFox<- suppressWarnings(c(as.numeric(as.character(foxData$GreyHeadedFlyingFox.Count))))
 totalFox <- suppressWarnings(c(as.numeric(as.character(foxData$TotalSpecies.Count))))
 camp <- (as.character(foxData$Camp))
+ehpCamp<-foxData$EHP.CampId
+
 
 #remove rows where variable FlyingFoxesAbsent does not match the total count being zero or not.
 
@@ -81,7 +83,7 @@ illogicalFox=setdiff(idHasFox,idHasNoFox)
 ##removing data with NA
 
 #make a vector of the rows which have missing data
-idNA=c(which(is.na(blkFox)),which(is.na(redFox)),which(is.na(greyFox)),which(is.na(totalFox)),which(is.na(camp)),illogicalFox)
+idNA=c(which(is.na(blkFox)),which(is.na(redFox)),which(is.na(greyFox)),which(is.na(totalFox)),which(is.na(camp)),illogicalFox,which(is.na(ehpCamp)))
 paste(length(idNA),"cases have NAs")
 
 #remove those rows
@@ -113,6 +115,7 @@ totalFox=totalFox[-idBadMath]
 dirty <-c(idNA,idBadMath)
 camp=camp[-dirty]
 
+ehpCamp=ehpCamp[-dirty]
 
 ```
 
@@ -164,8 +167,18 @@ proportions of each species.
 Discuss your results.
 
 ```{r}
-#still need to do proportions for each campsite.
+#get number of factors
+campFactor=nlevels(ehpCamp)
+#create empty vector
+foxPerCamp <- rep(NA, campFactor)
+#fill vector using for loop
+for(j in 1:as.numeric(campFactor)){
+    foxPerCamp[j] <- c(sum(totalFox[ehpCamp==j]))
+}
 
+#visualising with a scatterplot
+redblue <- colorRampPalette(c("red","blue"))
+plot(foxPerCamp,xlab="Per Camp",ylab="Total Flying Foxes",col=redblue(5))
 
 #proportion for whole species
 blk=sum(blkFox)
@@ -173,6 +186,7 @@ red=sum(redFox)
 grey=sum(greyFox)
 foxProp=c(blk,red,grey)/sum(totalFox)*100
 
+#visualise proportions with a bar plot
 barplot(matrix(foxProp),beside=TRUE, col=grey.colors(3), ylim=c(0,100))
 
 ```
@@ -199,8 +213,7 @@ use the function as.numeric to convert the resulting date objects to a numeric v
 
 ```{r}
 #load and clean data
-ehpCamp=foxData$EHP.CampId
-ehpCamp=ehpCamp[-dirty]
+
 #Use the function as.Date to convert the date strings in the variable SurveyDate into dates. 
 date <- suppressWarnings(c(as.Date(foxData$SurveyDate,"%d/%m/%y")))
 date=date[-dirty]
@@ -217,6 +230,6 @@ indo.lm=lm(indoFox ~ as.numeric(indoDates))
 
 summary(indo.lm)
 
-plot(indoFox~indoDates, col="red",xlab="Dates", ylab = "Num. FLying Foxes")
+plot(indoFox~indoDates, col=redblue(5),xlab="Dates", ylab = "Num. FLying Foxes")
 ```
 
