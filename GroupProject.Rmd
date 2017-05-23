@@ -31,7 +31,7 @@ below, declare that:
 Name               | Student Number | Contribution (%)
 -------------------|----------------|-----------------
 Rachel Hardie      |  18820821      |
-Hayden Smith       |                |
+Simon              |                |
 Jack Beckhaus      |                |
                    |                |
 
@@ -71,6 +71,8 @@ redFox<- suppressWarnings(c(as.numeric(as.character(foxData$LittleRedFlyingFox.C
 greyFox<- suppressWarnings(c(as.numeric(as.character(foxData$GreyHeadedFlyingFox.Count))))
 totalFox <- suppressWarnings(c(as.numeric(as.character(foxData$TotalSpecies.Count))))
 camp <- (as.character(foxData$Camp))
+ehpCamp<-foxData$EHP.CampId
+
 
 #remove rows where variable FlyingFoxesAbsent does not match the total count being zero or not.
 
@@ -86,7 +88,9 @@ camp=camp[-illogicalFox]
 ##removing data with NA
 
 #make a vector of the rows which have missing data
-idNA=c(which(is.na(blkFox)),which(is.na(redFox)),which(is.na(greyFox)),which(is.na(totalFox)),which(is.na(camp)))
+
+idNA=c(which(is.na(blkFox)),which(is.na(redFox)),which(is.na(greyFox)),which(is.na(totalFox)),which(is.na(camp)),illogicalFox,which(is.na(ehpCamp)))
+
 paste(length(idNA),"cases have NAs")
 
 #remove those rows
@@ -95,7 +99,6 @@ redFox=redFox[-idNA]
 greyFox=greyFox[-idNA]
 totalFox=totalFox[-idNA]
 camp=camp[-idNA]
-
 
 #calculate totals based on each species
 myTotal = blkFox+redFox+greyFox
@@ -107,17 +110,12 @@ paste(sum(is.na(idBadMath)),"rows have totals that dont match the sum of each sp
 #making a vecor of the NAs (which are actually the rows with bad maths)
 idBadMath=which(is.na(idBadMath))
 
-
-
 #removing the rows that have bad maths
 blkFox=blkFox[-idBadMath]
 redFox=redFox[-idBadMath]
 greyFox=greyFox[-idBadMath]
 totalFox=totalFox[-idBadMath]
 camp=camp[-idBadMath]
-
-
-
 
 ```
 
@@ -169,7 +167,18 @@ proportions of each species.
 Discuss your results.
 
 ```{r}
+#get number of factors
+campFactor=nlevels(ehpCamp)
+#create empty vector
+foxPerCamp <- rep(NA, campFactor)
+#fill vector using for loop
+for(j in 1:as.numeric(campFactor)){
+    foxPerCamp[j] <- c(sum(totalFox[ehpCamp==j]))
+}
 
+#visualising with a scatterplot
+redblue <- colorRampPalette(c("red","blue"))
+plot(foxPerCamp,xlab="Per Camp",ylab="Total Flying Foxes",col=redblue(5))
 
 #proportion for whole species
 blk=sum(blkFox)
@@ -177,7 +186,8 @@ red=sum(redFox)
 grey=sum(greyFox)
 foxProp=c(blk,red,grey)/sum(totalFox)*100
 
-pie(table(foxProp))
+#visualise proportions with a bar plot
+barplot(matrix(foxProp),beside=TRUE, col=grey.colors(3), ylim=c(0,100))
 
 ```
 
@@ -187,6 +197,41 @@ a camp and the proportion of Little Red Flying Foxes in that camp is non-zero.
 Interpret your results.
 
 ```{r}
+redFox.3b=which(redFox>0)
+totalFox.3b=totalFox[redFox.3b]
+redFox.3b=redFox[redFox.3b]
+
+cor.test(redFox.3b/totalFox.3b,totalFox.3b, alternative = "two.sided", conf.level = 0.99)
+```
+
+Part 4 - Camp size at Indooroopilly Island over time
+--------------------------------------------------------
+[2 marks] Use concepts related to linear regression to test at a signifcance level of 1% whether there is evidence that the number of fying foxes at the Indooroopilly Island camp (EHP CampId 68) has decreased over time.
+Use the function as.Date to convert the date strings in the variable SurveyDate into dates. (Check the manual page
+and make sure that you use the correct format string for the dd/mm/yy format used in the csv file!) If needed, you can
+use the function as.numeric to convert the resulting date objects to a numeric value.
+
+```{r}
+#load and clean data
+
+#Use the function as.Date to convert the date strings in the variable SurveyDate into dates. 
+date <- suppressWarnings(c(as.Date(foxData$SurveyDate,"%d/%m/%y")))
+date=date[-dirty]
+
+#vector of id for Indooroopilly Island Camp
+idIndoIsland=which(ehpCamp=="68")
+
+#create vector of data and total fox count for Indooroopilly Island 
+indoDates=date[idIndoIsland]
+indoFox=totalFox[idIndoIsland]
+
+# This is probably wrong
+indo.lm=lm(indoFox ~ as.numeric(indoDates))
+
+summary(indo.lm)
+
+plot(indoFox~indoDates, col=redblue(5),xlab="Dates", ylab = "Num. FLying Foxes")
+abline(indo.lm)
 
 ```
 
