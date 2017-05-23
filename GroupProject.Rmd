@@ -117,6 +117,12 @@ greyFox=greyFox[-idBadMath]
 totalFox=totalFox[-idBadMath]
 camp=camp[-idBadMath]
 
+
+dirty <-c(idNA,idBadMath)
+camp=camp[-dirty]
+
+ehpCamp=ehpCamp[-dirty]
+
 ```
 
 Interpret the solution of the problem.
