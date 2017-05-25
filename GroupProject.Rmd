@@ -31,9 +31,8 @@ below, declare that:
 Name               | Student Number | Contribution (%)
 -------------------|----------------|-----------------
 Rachel Hardie      |  18820821      |
+Jack Beckhaus      |  18034787      |
 Simon              |                |
-Jack Beckhaus      |                |
-                   |                |
 
 <div style="page-break-before:always;"></div>
 
@@ -56,10 +55,7 @@ Part One - Load and clean up data
 
 Load and clean the data is the csv file
 
-Some of the records (rows) in the data set are inconsistent, in that either the total species count does not equal
-the sum of the counts for the three species, or the variable FlyingFoxesAbsent does not match the total count being
-zero or not.
-Remove inconsistent records from the data set.
+Some of the records (rows) in the data set are inconsistent, in that either the total species count does not equal the sum of the counts for the three species, or the variable FlyingFoxesAbsent does not match the total count being zero or not. Remove inconsistent records from the data set.
 
 ```{r}
 #load the data from csv
@@ -80,17 +76,10 @@ idHasFox=which(foxData$FlyingFoxesAbsent!=TRUE)
 idHasNoFox=which(suppressWarnings(c(as.numeric(as.character(foxData$TotalSpecies.Count))))!=0)
 illogicalFox=setdiff(idHasFox,idHasNoFox)
 
-blkFox=blkFox[-illogicalFox]
-redFox=redFox[-illogicalFox]
-greyFox=greyFox[-illogicalFox]
-totalFox=totalFox[-illogicalFox]
-camp=camp[-illogicalFox]
 ##removing data with NA
 
 #make a vector of the rows which have missing data
-
 idNA=c(which(is.na(blkFox)),which(is.na(redFox)),which(is.na(greyFox)),which(is.na(totalFox)),which(is.na(camp)),illogicalFox,which(is.na(ehpCamp)))
-
 paste(length(idNA),"cases have NAs")
 
 #remove those rows
@@ -98,7 +87,7 @@ blkFox=blkFox[-idNA]
 redFox=redFox[-idNA]
 greyFox=greyFox[-idNA]
 totalFox=totalFox[-idNA]
-camp=camp[-idNA]
+
 
 #calculate totals based on each species
 myTotal = blkFox+redFox+greyFox
@@ -110,12 +99,12 @@ paste(sum(is.na(idBadMath)),"rows have totals that dont match the sum of each sp
 #making a vecor of the NAs (which are actually the rows with bad maths)
 idBadMath=which(is.na(idBadMath))
 
+
 #removing the rows that have bad maths
 blkFox=blkFox[-idBadMath]
 redFox=redFox[-idBadMath]
 greyFox=greyFox[-idBadMath]
 totalFox=totalFox[-idBadMath]
-camp=camp[-idBadMath]
 
 
 dirty <-c(idNA,idBadMath)
@@ -123,15 +112,12 @@ camp=camp[-dirty]
 
 ehpCamp=ehpCamp[-dirty]
 
-```
 
-Interpret the solution of the problem.
+```
 
 Part Two - Camp size
 --------------------------------------------------------
-(a) [2 marks] Analyse the distribution of the total camp size (TotalSpecies.Count) and the distribution of the
-natural logarithm2 of the total camp size for non-empty camps.
-Explain why the logarithm of the camp size is the more meaningful variable to consider.
+(a) [2 marks] Analyse the distribution of the total camp size (TotalSpecies.Count) and the distribution of the natural logarithm of the total camp size for non-empty camps. Explain why the logarithm of the camp size is the more meaningful variable to consider.
 ```{r}
 ##natural logarithm of the total species count per camp
 foxyCamps=which(foxData$FlyingFoxesAbsent!=TRUE)
@@ -145,6 +131,8 @@ foxyCamps.length=length(foxyCamps)
 hist(log.CampSize)
 ```
 
+The log scale of the camp size is a more appropriate way in which to display the data visually. Rather than compressing a large range of numbers into the x-axis the same data can be represented simply and accurately by taking the logarithm. Simply this method is the only way we can extract a meaningful visualisation of the data.
+
 
 (b) [2 marks] Use bootstrapping to compute a 95% confidence interval for the mean logarithm of the total camp size for
 non-empty camps.
@@ -156,23 +144,28 @@ Interpret your result.
 b = 10000
 boot.dist = rep(NA, b)
 for (i in 1:b) {
-boot.sample = sample(foxyCamps, replace=TRUE)
-boot.dist=log(boot.sample)
-boot.dist[i]=mean(boot.dist)
-sd(boot.dist)
+  boot.sample = sample(foxyCamps, replace=TRUE)
+  boot.dist=log(boot.sample)
+  boot.dist[i]=mean(boot.dist, conf.level = 0.95)
+  sd(boot.dist)
 }
 hist(boot.dist)
 
+
 ```
 
+Because we are taking the log of the camp size a large range of numbers is expressed in a much shorter range. Each interval represents a large range of actual camp size, as a result our bootstrap histogram is nearly identical to the histogram of the entire population (log). There is slight left skewing of this distribution.
+
+```{r}
+```
 Part Three - Species Proportions
 --------------------------------------------------------
 
-(a) [2 marks] Compute the proportions of each species at each camp site and visualise them. Then compute the overall
-proportions of each species.
+(a) [2 marks] Compute the proportions of each species at each camp site and visualise them. Then compute the overall proportions of each species.
 Discuss your results.
 
 ```{r}
+
 #get number of factors
 campFactor=nlevels(ehpCamp)
 #create empty vector
@@ -190,12 +183,20 @@ plot(foxPerCamp,xlab="Per Camp",ylab="Total Flying Foxes",col=redblue(5))
 blk=sum(blkFox)
 red=sum(redFox)
 grey=sum(greyFox)
-foxProp=c(blk,red,grey)/sum(totalFox)*100
+foxProp=c(red,blk,grey)/sum(totalFox)*100
+matrixHead=c("red","black","grey")
+foxPropTbl = matrix(c(foxProp,matrixHead),ncol=3,byrow=TRUE)
+
+foxPropTbl
 
 #visualise proportions with a bar plot
-barplot(matrix(foxProp),beside=TRUE, col=grey.colors(3), ylim=c(0,100))
+barplot(matrix(foxProp),names.arg=c("Red Fox", "Black Fox", "Grey Fox"), beside=TRUE, col=grey.colors(3), ylim=c(0,100), ylab = "Proportion of Foxes (%)")
 
 ```
+
+The proportion of Red Foxes is the most significant at nearly 47% of the population, the other two groups are much smaller comparatively both closer to 25% of the population (black ??? 28%, grey ??? 25%)
+
+
 
 (b) [2 marks] Analyse whether the total camp size and the proportion of Little Red Flying Foxes are associated by
 testing at a signifcance level of 1% whether whether there is evidence that the correlation between the total size of
@@ -208,8 +209,13 @@ totalFox.3b=totalFox[redFox.3b]
 redFox.3b=redFox[redFox.3b]
 
 cor.test(redFox.3b/totalFox.3b,totalFox.3b, alternative = "two.sided", conf.level = 0.99)
+
 ```
 
+The Pearson correlation coefficient in this set of results is a fairly low positive number which indicates a weak positive correlation between total camp size and the proportion of red foxes
+
+```{r}
+```
 Part 4 - Camp size at Indooroopilly Island over time
 --------------------------------------------------------
 [2 marks] Use concepts related to linear regression to test at a signifcance level of 1% whether there is evidence that the number of fying foxes at the Indooroopilly Island camp (EHP CampId 68) has decreased over time.
@@ -235,9 +241,94 @@ indoFox=totalFox[idIndoIsland]
 indo.lm=lm(indoFox ~ as.numeric(indoDates))
 
 summary(indo.lm)
-
-plot(indoFox~indoDates, col=redblue(5),xlab="Dates", ylab = "Num. FLying Foxes")
-abline(indo.lm)
-
 ```
 
+The p-value is greater than 1% (the significance level that we are testing at), therefore we do not reject the null hypothesis that the population of flying foxes at the Indooroopilly Island camp is decreasing
+
+```{r}
+plot(indoFox~indoDates, col=redblue(5),xlab="Dates", ylab = "Num. FLying Foxes")
+
+abline(lm(indoFox ~ indoDates))
+```
+
+Part 5 - Species proportions at Laidley Plainlands Road camp
+--------------------------------------------------------
+We want to test whether the Species proportions at the Laidley Plainlands Road camp (EHP CampID 76) have changed between 18/10/2013 and 13/11/2013.
+
+(a) [1 mark] Use a X^2-test for goodness of fit to test whether the species counts on 13/11/2013 differ significantly from the species proportions on 18/10/2013.
+```{r}
+#vector of id for Laidley Plainlands Camp
+idLaidley=which(ehpCamp=="76")
+
+date <- suppressWarnings(c(as.Date(foxData$SurveyDate,"%d/%m/%y")))
+date=date[-dirty]
+
+#vector of dates at the Laidley Plainlands Camp
+laidleyDates=date[idLaidley]
+
+
+#reduces dates vector to the specified dates
+#first date
+laidleyDates1 <- laidleyDates[laidleyDates == "2013-10-18"]
+#second date
+laidleyDates2 <- laidleyDates[laidleyDates == "2013-11-13"]
+
+
+#get all the dates that match in the data set
+#first date
+idLaidleyDates1=which(date==laidleyDates1)
+#second date
+idLaidleyDates2=which(date==laidleyDates2)
+
+
+#find the matching id of the two vectors
+#first date
+idLaidley1 <- idLaidley[(idLaidley %in% idLaidleyDates1)]
+#second date
+idLaidley2 <- idLaidley[(idLaidley %in% idLaidleyDates2)]
+
+#retrieve species data from the two dates
+blkD1=blkFox[idLaidley1]
+blkD2=blkFox[idLaidley2]
+
+redD1=redFox[idLaidley1]
+redD2=redFox[idLaidley2]
+  
+greyD1=greyFox[idLaidley1]
+greyD2=greyFox[idLaidley2]
+
+fox1=c(redD1,blkD1,greyD1)
+fox2=c(redD2,blkD2,greyD2)
+
+foxSum1=sum(blkD1,redD1,greyD1)
+foxSum2=sum(blkD2,redD2,greyD2)
+
+foxPropD1=c(redD1,blkD1,greyD1)/foxSum1
+foxPropD2=c(redD2,blkD2,greyD2)/foxSum2
+
+
+#Observed proportion (date2)
+observed = foxPropD2
+#expected proportion (date1)
+expected = foxPropD1
+
+foxPropD1
+foxPropD2
+#chi-square test
+observed = fox2
+expected = foxPropD1
+
+chisq.test(x=observed,p=expected)
+```
+
+(b) [1 mark] Use a X^2-test for independence to test whether the species counts are associated to the categorical variable with the categories 18/10/2013 and 13/11/2013.
+```{r}
+
+tbl <- matrix(c(blkD1,redD1,greyD1,blkD2,redD2,greyD2),ncol=3,byrow=TRUE)
+
+chisq.test(tbl)
+
+```
+(c) [1 mark] Compare the p-values obtained in (a) and   (b).Discuss the difference between the tests (a)     and (b), and explain which is more appropriate and   why.
+
+  "EXPLANATION"
