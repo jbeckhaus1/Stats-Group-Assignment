@@ -1,54 +1,44 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
 Cover Sheet
 ========================================================
 
-
-By including this statement, we, all the students listed in the table
-below, declare that:
+By including this statement, we, all the students listed in the table below, declare that:
 
 - We hold a copy of this assignment if the original is lost or damaged.
 
-- We hereby certify that no part of this assignment has been copied from
-  any other student's work or from any other source except where due
-  acknowledgement is made in the assignment.
+- We hereby certify that no part of this assignment has been copied from any other student's work or from any other source except where due acknowledgement is made in the assignment.
 
-- No part of the assignment has been written for us by any other person
-  except where collaboration has been authorised by the unit coordinator.
+- No part of the assignment has been written for us by any other person except where collaboration has been authorised by the unit coordinator.
 
-- We are aware that this work may be reproduced and submitted to plagiarism
-  detection software programs for the purpose of detecting possible
-  plagiarism; this software may retain a copy on its database for future
-  plagiarism checking.
+- We are aware that this work may be reproduced and submitted to plagiarism detection software programs for the purpose of detecting possible plagiarism; this software may retain a copy on its database for future plagiarism checking.
 
-- We hereby certify that no part of this assignment or product has been
-  submitted by any of us in another (previous or current) assessment, except
-  where appropriately referenced, and with prior permission from the unit
-  coordinator for this unit.
+- We hereby certify that no part of this assignment or product has been submitted by any of us in another (previous or current) assessment, except where appropriately referenced, and with prior permission from the unit coordinator for this unit.
 
-- We hereby certify that we have read and understand what the University
-  considers to be academic misconduct, and that we are aware of the
-  penalties that may be imposed for academic misconduct.
+- We hereby certify that we have read and understand what the University considers to be academic misconduct, and that we are aware of the penalties that may be imposed for academic misconduct.
 
 Name               | Student Number | Contribution (%)
 -------------------|----------------|-----------------
-Rachel Hardie      |  18820821      |
-Jack Beckhaus      |  18034787      |
-Simon              |                |
+Rachel Hardie      |  18820821      | 50%
+Jack Beckhaus      |  18034787      | 50%
+Simon Templeton    |                | 0%
 
 <div style="page-break-before:always;"></div>
-
 
 Group Project
 ========================================================
 
 Explain the assignment.
 
+This Group Project analyses data on flying fox populations obtained from the Queensland Government website.
 
-This project uses Git for versioning
-
+This project uses Git for versioning:
 https://github.com/jbeckhaus1/Stats-Group-Assignment
-
 https://github.com/rachelsoma/Stats-Group-Assignment
-
 
 Part One - Load and clean up data
 --------------------------------------------------------
@@ -69,7 +59,6 @@ totalFox <- suppressWarnings(c(as.numeric(as.character(foxData$TotalSpecies.Coun
 camp <- (as.character(foxData$Camp))
 ehpCamp<-foxData$EHP.CampId
 
-
 #remove rows where variable FlyingFoxesAbsent does not match the total count being zero or not.
 
 idHasFox=which(foxData$FlyingFoxesAbsent!=TRUE)
@@ -77,7 +66,6 @@ idHasNoFox=which(suppressWarnings(c(as.numeric(as.character(foxData$TotalSpecies
 illogicalFox=setdiff(idHasFox,idHasNoFox)
 
 ##removing data with NA
-
 #make a vector of the rows which have missing data
 idNA=c(which(is.na(blkFox)),which(is.na(redFox)),which(is.na(greyFox)),which(is.na(totalFox)),which(is.na(camp)),illogicalFox,which(is.na(ehpCamp)))
 paste(length(idNA),"cases have NAs")
@@ -87,7 +75,6 @@ blkFox=blkFox[-idNA]
 redFox=redFox[-idNA]
 greyFox=greyFox[-idNA]
 totalFox=totalFox[-idNA]
-
 
 #calculate totals based on each species
 myTotal = blkFox+redFox+greyFox
@@ -99,19 +86,16 @@ paste(sum(is.na(idBadMath)),"rows have totals that dont match the sum of each sp
 #making a vecor of the NAs (which are actually the rows with bad maths)
 idBadMath=which(is.na(idBadMath))
 
-
 #removing the rows that have bad maths
 blkFox=blkFox[-idBadMath]
 redFox=redFox[-idBadMath]
 greyFox=greyFox[-idBadMath]
 totalFox=totalFox[-idBadMath]
 
-
 dirty <-c(idNA,idBadMath)
 camp=camp[-dirty]
 
 ehpCamp=ehpCamp[-dirty]
-
 
 ```
 
@@ -129,6 +113,7 @@ foxyCamps.length=length(foxyCamps)
 
 ##histogram of camp size logarithm
 hist(log.CampSize)
+
 ```
 
 The log scale of the camp size is a more appropriate way in which to display the data visually. Rather than compressing a large range of numbers into the x-axis the same data can be represented simply and accurately by taking the logarithm. Simply this method is the only way we can extract a meaningful visualisation of the data.
@@ -136,7 +121,7 @@ The log scale of the camp size is a more appropriate way in which to display the
 
 (b) [2 marks] Use bootstrapping to compute a 95% confidence interval for the mean logarithm of the total camp size for
 non-empty camps.
-Interpret your result.
+
 ```{r}
 
 ##boot strap of mean camp size logarithm
@@ -151,11 +136,9 @@ for (i in 1:b) {
 }
 hist(boot.dist)
 
-
 ```
 
 Because we are taking the log of the camp size a large range of numbers is expressed in a much shorter range. Each interval represents a large range of actual camp size, as a result our bootstrap histogram is nearly identical to the histogram of the entire population (log). There is slight left skewing of this distribution.
-
 
 Part Three - Species Proportions
 --------------------------------------------------------
@@ -164,7 +147,6 @@ Part Three - Species Proportions
 Discuss your results.
 
 ```{r}
-
 #get number of factors
 campFactor=nlevels(ehpCamp)
 #create empty vector
@@ -177,10 +159,7 @@ for(j in 1:as.numeric(campFactor)){
 #visualising with a scatterplot
 redblue <- colorRampPalette(c("red","blue"))
 plot(foxPerCamp,xlab="Per Camp",ylab="Total Flying Foxes",col=redblue(5))
-```
 
-
-```{r}
 #proportion for whole species
 blk=sum(blkFox)
 red=sum(redFox)
@@ -190,18 +169,13 @@ matrixHead=c("red","black","grey")
 foxPropTbl = matrix(c(foxProp,matrixHead),ncol=3,byrow=TRUE)
 
 foxPropTbl
-```
 
-
-```{r}
 #visualise proportions with a bar plot
 barplot(matrix(foxProp),names.arg=c("Red Fox", "Black Fox", "Grey Fox"), beside=TRUE, col=grey.colors(3), ylim=c(0,100), ylab = "Proportion of Foxes (%)")
 
 ```
 
 The proportion of Red Foxes is the most significant at nearly 47% of the population, the other two groups are much smaller comparatively both closer to 25% of the population (black ??? 28%, grey ??? 25%)
-
-
 
 (b) [2 marks] Analyse whether the total camp size and the proportion of Little Red Flying Foxes are associated by
 testing at a signifcance level of 1% whether whether there is evidence that the correlation between the total size of
@@ -240,18 +214,21 @@ idIndoIsland=which(ehpCamp=="68")
 indoDates=date[idIndoIsland]
 indoFox=totalFox[idIndoIsland]
 
-# This is probably wrong
+#linear regression
 indo.lm=lm(indoFox ~ as.numeric(indoDates))
 
 summary(indo.lm)
+
 ```
 
 The p-value is greater than 1% (the significance level that we are testing at), therefore we do not reject the null hypothesis that the population of flying foxes at the Indooroopilly Island camp is decreasing
 
 ```{r}
+#visualisation
 plot(indoFox~indoDates, col=redblue(5),xlab="Dates", ylab = "Num. FLying Foxes")
 
 abline(lm(indoFox ~ indoDates))
+
 ```
 
 Part 5 - Species proportions at Laidley Plainlands Road camp
@@ -259,14 +236,15 @@ Part 5 - Species proportions at Laidley Plainlands Road camp
 We want to test whether the Species proportions at the Laidley Plainlands Road camp (EHP CampID 76) have changed between 18/10/2013 and 13/11/2013.
 
 (a) [1 mark] Use a X^2-test for goodness of fit to test whether the species counts on 13/11/2013 differ significantly from the species proportions on 18/10/2013.
-
 ```{r}
 #vector of id for Laidley Plainlands Camp
 idLaidley=which(ehpCamp=="76")
 
+date <- suppressWarnings(c(as.Date(foxData$SurveyDate,"%d/%m/%y")))
+date=date[-dirty]
+
 #vector of dates at the Laidley Plainlands Camp
 laidleyDates=date[idLaidley]
-
 
 #reduces dates vector to the specified dates
 #first date
@@ -274,13 +252,11 @@ laidleyDates1 <- laidleyDates[laidleyDates == "2013-10-18"]
 #second date
 laidleyDates2 <- laidleyDates[laidleyDates == "2013-11-13"]
 
-
 #get all the dates that match in the data set
 #first date
 idLaidleyDates1=which(date==laidleyDates1)
 #second date
 idLaidleyDates2=which(date==laidleyDates2)
-
 
 #find the matching id of the two vectors
 #first date
@@ -307,7 +283,6 @@ foxSum2=sum(blkD2,redD2,greyD2)
 foxPropD1=c(redD1,blkD1,greyD1)/foxSum1
 foxPropD2=c(redD2,blkD2,greyD2)/foxSum2
 
-
 #Observed proportion (date2)
 observed = foxPropD2
 #expected proportion (date1)
@@ -316,20 +291,27 @@ expected = foxPropD1
 foxPropD1
 foxPropD2
 #chi-square test
+#the expected value in this instance ifs the the proportion of foxes on the first date then this is compared to the frequency of foxes observed on the second date.
 observed = fox2
 expected = foxPropD1
 
+#chi squared test for goodness of fit
 chisq.test(x=observed,p=expected)
+
 ```
 
 (b) [1 mark] Use a X^2-test for independence to test whether the species counts are associated to the categorical variable with the categories 18/10/2013 and 13/11/2013.
-```{r}
 
+```{r}
+#create a table (matrix) for testing population of each species against the dates
 tbl <- matrix(c(blkD1,redD1,greyD1,blkD2,redD2,greyD2),ncol=3,byrow=TRUE)
 
+#chi test for independence
 chisq.test(tbl)
 
 ```
-(c) [1 mark] Compare the p-values obtained in (a) and   (b).Discuss the difference between the tests (a)     and (b), and explain which is more appropriate and   why.
 
-  "EXPLANATION"
+(c) [1 mark] Compare the p-values obtained in (a) and (b).Discuss the difference between the tests (a) and (b), and explain which is more appropriate and why.
+
+The secend Chi square test is the more appropriate of the two methods, it tests the association between the populations on the two dates as opposed to the goodness of fit method which tested for proportions on the first date being related to proportions on the second date. As we want to test for decrease in population testing proportions is hardly relevant.
+The p-values in each test in part (a) and (b) yielded very small values (less than 1%) which means in most cases we would reject the null hypothesis, in the second test the null hypothesis is that there is no associations between the variables which means we reject this. In the first instance we reject the hypothesis that th proportions in the first date are the same as the proportions ont the second date.
